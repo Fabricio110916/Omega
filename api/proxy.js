@@ -3,29 +3,22 @@ export default async function handler(req, res) {
 
   try {
     const headers = { ...req.headers };
+
     headers.host = "my.koom.pp.ua";
-
-    delete headers["content-length"];
-    delete headers["transfer-encoding"];
-    delete headers["connection"];
-
-    const isBodyAllowed = !["GET", "HEAD"].includes(req.method);
+    headers["x-forwarded-for"] = req.socket?.remoteAddress || "1.1.1.1";
+    headers["x-real-ip"] = headers["x-forwarded-for"];
 
     const response = await fetch(target, {
       method: req.method,
       headers,
-      body: isBodyAllowed ? req : undefined,
-      duplex: isBodyAllowed ? "half" : undefined, // 🔥 ESSENCIAL
-      redirect: "manual"
+      body: ["GET", "HEAD"].includes(req.method) ? undefined : req,
+      duplex: "half",
+      redirect: "manual",
+      // força comportamento mais simples
+      cache: "no-store"
     });
 
-    res.status(response.status);
-
-    response.headers.forEach((value, key) => {
-      if (!["content-encoding", "transfer-encoding", "connection"].includes(key)) {
-        res.setHeader(key, value);
-      }
-    });
+    res.writeHead(response.status, Object.fromEntries(response.headers));
 
     if (response.body) {
       response.body.pipe(res);
@@ -34,7 +27,7 @@ export default async function handler(req, res) {
     }
 
   } catch (err) {
-    console.error("Proxy error:", err);
-    res.status(500).send("Proxy error: " + err.message);
+    console.error(err);
+    res.status(502).send("Bad Gateway: " + err.message);
   }
 }
