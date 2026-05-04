@@ -7,9 +7,15 @@ export default async function handler(req) {
 
   const target = "https://my.koom.pp.ua" + url.pathname + url.search;
 
+  const headers = new Headers(req.headers);
+
+  // força host correto (muito importante)
+  headers.set("host", "my.koom.pp.ua");
+
   return fetch(target, {
     method: req.method,
-    headers: req.headers,
-    body: req.body
+    headers,
+    body: req.body,
+    redirect: "manual"
   });
 }
