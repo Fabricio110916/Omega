@@ -1,15 +1,6 @@
 {
   "version": 2,
   "regions": ["gru1"],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Connection", "value": "Upgrade" },
-        { "key": "Upgrade", "value": "websocket" }
-      ]
-    }
-  ],
   "routes": [
     {
       "src": "/(.*)",
