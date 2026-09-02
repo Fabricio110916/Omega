@@ -1,11 +1,11 @@
 export default async function handler(req, res) {
-  const targetBase = "https://my.koom.pp.ua";
+  const targetBase = "http://new.koom.pp.ua";
   const targetUrl = targetBase + req.url;
 
   try {
     // clona headers e ajusta Host
     const headers = { ...req.headers };
-    headers.host = "my.koom.pp.ua";
+    headers.host = "new.koom.pp.ua";
 
     // remove alguns problemáticos
     delete headers["content-length"];
